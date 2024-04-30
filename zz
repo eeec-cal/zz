@@ -3,7 +3,7 @@
 aur=yay
 version=$($aur -Si zz | awk -F ": " 'FNR == 3 {print $2}')
 
-while getopts "pydhvVzRPo:" flag; do
+while getopts "pydhvVzRPo:r" flag; do
 	case $flag in
 		p)
 			aur=paru
@@ -27,6 +27,11 @@ while getopts "pydhvVzRPo:" flag; do
 			$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -Si - | awk -F ": " 'FNR == 4 {print $2}'
 			exit 0
 			;;
+		r)
+			pkg=$(yay -Sl | awk '{print $2}' | fzf --layout reverse --border rounded)
+			curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$pkg
+			exit 0
+			;;
 		h)
 			echo "
 	zz: AUR Helper Helper
@@ -42,6 +47,7 @@ while getopts "pydhvVzRPo:" flag; do
 	-V                                                   Gets selected package version.
 	-z                                                   Shows only installed packages.
 	-P                                                             Shows PKGBUILD info.
+	-r                                                               Gets raw PKGBUILD.
 			"
 			exit 0
 			;;
