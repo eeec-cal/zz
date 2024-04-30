@@ -26,6 +26,8 @@ To use zz, you have to acknowledge the different flags:
  
 	`-P`:                                  Gets the PKGBUILD info of the selected package.
 
+	`-r`:                                                               Gets raw PKGBUILD.
+
 
 
 To install a package using zz, just look the package up and select it with the `Enter` key.
