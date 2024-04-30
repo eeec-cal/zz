@@ -3,7 +3,7 @@
 aur=yay
 version=$($aur -Si zz | awk -F ": " 'FNR == 3 {print $2}')
 
-while getopts "pydhvVzRo:" flag; do
+while getopts "pydhvVzRPo:" flag; do
 	case $flag in
 		p)
 			aur=paru
@@ -16,6 +16,10 @@ while getopts "pydhvVzRo:" flag; do
 			;;
 		R)
 			$aur -Qn | awk '{print $1}' | fzf --layout reverse --border rounded | $aur -R -
+			exit 0
+			;;
+		P)
+			$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -Si -
 			exit 0
 			;;
 
@@ -37,6 +41,7 @@ while getopts "pydhvVzRo:" flag; do
 	-v                                                                 Gets zz version.
 	-V                                                   Gets selected package version.
 	-z                                                   Shows only installed packages.
+	-P                                                             Shows PKGBUILD info.
 			"
 			exit 0
 			;;
