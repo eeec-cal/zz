@@ -3,7 +3,7 @@
 aur=yay
 version="1.4-1"
 
-while getopts "pydhvVzRPo:r" flag; do
+while getopts "pydhvVzRPo:U" flag; do
 	case $flag in
 		p)
 			aur=paru
@@ -15,21 +15,16 @@ while getopts "pydhvVzRPo:r" flag; do
 			aur=${OPTARG}
 			;;
 		R)
-			$aur -Qn | awk '{print $1}' | fzf --layout reverse --border rounded | $aur -R -
+			$aur -Qq | awk '{print $1}' | sk --reverse --prompt "Remove Package: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -R -
 			exit 0
 			;;
 		P)
-			$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -Si -
+			$aur -Sl | awk '{print $2}' | sk --reverse --prompt "Get SRCINFO: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -Si -
 			exit 0
 			;;
 
 		d)
-			$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -Si - | awk -F ": " 'FNR == 4 {print $2}'
-			exit 0
-			;;
-		r)
-			pkg=$(yay -Sl | awk '{print $2}' | fzf --layout reverse --border rounded)
-			curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$pkg
+			$aur -Sl | awk '{print $2}' | sk --reverse --prompt "Get Package Description: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -Si - | awk -F ": " 'FNR == 4 {print $2}'
 			exit 0
 			;;
 		h)
@@ -56,11 +51,20 @@ while getopts "pydhvVzRPo:r" flag; do
 			exit 0
 			;;
 		V)
-			$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -Si - | awk -F ": " 'FNR == 3 {print $2}'
+			$aur -Sl | awk '{print $2}' | sk --reverse --prompt "Get Package Version: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -Si - | awk -F ": " 'FNR == 3 {print $2}'
 			exit 0
 			;;
 		z)
-			$aur -Qn | awk '{print $1}' | fzf --layout reverse --border rounded | $aur -S -
+			$aur -Qq | awk '{print $1}' | sk --reverse --prompt "Browse Installed Packages: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -S -
+			exit 0
+			;;
+		U)
+			echo "-Sy (update sources)
+-Syu (update sources & packages)
+-Qn (shows all installed packages)
+-Qm (lists every AUR package)
+-Qdt (lists every orphaned package)
+-Sc (clears package cache)" | sk --reverse --prompt "Choose Action: " | awk '{print $1}' |xargs $aur
 			exit 0
 			;;
 		*)
@@ -71,7 +75,7 @@ while getopts "pydhvVzRPo:r" flag; do
 done
 
 if (( OPTIND == 1 )); then
-	aur=yay
+	aur=$aur
 fi
 
-$aur -Sl | awk '{print $2}' | fzf --layout reverse --border rounded | $aur -S -
+$aur -Sl | awk '{print $2}' | sk --reverse --prompt "zz: " --preview 'curl -s "https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=$(echo {} | tr -d "[:space:]")"' | $aur -S -
